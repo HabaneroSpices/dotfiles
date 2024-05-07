@@ -1,0 +1,16 @@
+[core]
+	excludesfile = ~/.gitignore
+[push]
+	autoSetupRemote = true
+[include]
+	path = .gitconfig_alias
+[help]
+	autocorrect = 1
+[fetch]
+    # Remove any remote-tracking references that no longer exist on the remote.
+	prune = true
+[init]
+	defaultBranch = main
+[user]
+	email = "habanerospices@gmail.com"
+	name = "HabaneroSpices"
