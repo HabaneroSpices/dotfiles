@@ -43,5 +43,4 @@ function rcsync() {
 	    git add . && \
 	    git commit -m "Sync : $(hostname --short)" && \
 	    git push
-	cd -
 }
