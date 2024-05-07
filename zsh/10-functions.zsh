@@ -35,3 +35,13 @@ function e(){
         return
     fi
 }
+
+function rcsync() {
+    cd $HOME/.dotfiles
+	git fetch && \
+	    git pull && \
+	    git add . && \
+	    git commit -m "Sync : $(hostname --short)" && \
+	    git push
+	cd -
+}
