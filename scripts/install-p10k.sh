@@ -5,17 +5,20 @@
 
 export DOTFILES_DIR="$HOME/.dotfiles"
 export ZSH_CUSTOM="$HOME/.zsh"
-REQUIRED_PKG=("zsh" "fzf" "git" "curl" "gpg")
 
 main (){
     case $DISTRO in
     *Debian*|*Mint*);;
     *)  error "${DISTRO} is not supported" 1;;
     esac
-    apt_install
-    add_eza
 
+    REQUIRED_PKG=("zsh" "fzf" "git" "curl" "gpg")
     apt_install
+    
+    REQUIRED_PKG=()
+    add_eza
+    apt_install
+
     install_omz
     install_p10k
     install_plugins
@@ -76,7 +79,7 @@ fi
 
 
 ## Begin Default script
-source $DOTFILES_DIR/scripts/autoload.sh
+source $DOTFILES_DIR/scripts/lib/autoload.sh
 
 ## Run main function
 main
