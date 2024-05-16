@@ -5,7 +5,7 @@ fi
 
 export TERM_SHELL=zsh
 
-export PATH=$HOME/.local/bin:/usr/local/bin:$PATH
+export PATH=$HOME/.local/bin:/usr/local/bin:/home/madsc/.config/composer/vendor/bin:$PATH
 
 export ZSH="$HOME/.oh-my-zsh"
 

@@ -1,12 +1,13 @@
 # General
 
-ifCmdExist python  && alias py='python'
-ifCmdExist python3 && alias py3='python3'
-ifCmdExist tput    && alias cl='tput reset'
-ifCmdExist nvim    && alias vim='nvim' && alias v='nvim'
-ifCmdExist tree    && alias tree='tree -a -I .git --dirsfirst'
-ifCmdExist lazygit && alias lg='lazygit'
-#ifCmdExist nala    && alias apt='sudo nala'
+ifCmdExist python       && alias py='python'
+ifCmdExist python3      && alias py3='python3'
+ifCmdExist tput         && alias cl='tput reset'
+ifCmdExist nvim         && alias vim='nvim' && alias v='nvim'
+ifCmdExist tree         && alias tree='tree -a -I .git --dirsfirst'
+ifCmdExist lazygit      && alias lg='lazygit'
+ifCmdExist nala         && alias apt='sudo nala'
+ifCmdExist fastfetch    && alias ff='fastfetch --logo Radix'
 #ifCmdExist z       && alias cd='z'
 
 if ifCmdExist eza; then
@@ -50,8 +51,13 @@ fi
 
 ## docker-compose
 
+
 if ifCmdExist docker-compose; then
     alias dc='docker-compose'
+elif docker compose version >/dev/null 2>&1; then
+    alias dc='docker compose'
+fi
+if alias "dc" >/dev/null; then
     alias dcu='dc up -d'
     alias dcd='dc down'
     alias dcr='dcd; dcu'
