@@ -30,5 +30,9 @@ export VISUAL='/usr/local/bin/nvim'
 
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 
+eval "$(zoxide init zsh)"
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
