@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/zsh
 #
 # Functions for the shell :)
 #

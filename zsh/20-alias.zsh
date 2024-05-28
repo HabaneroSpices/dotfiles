@@ -1,3 +1,4 @@
+#!/usr/bin/zsh
 # General
 
 ifCmdExist python       && alias py='python'
@@ -26,6 +27,14 @@ alias mkdir='mkdir -p'
 alias cp='cp -r --reflink=auto'
 alias mv='mv'
 
+alias gst='git status'
+alias gp='git pull'
+alias gP='git push'
+alias gf='git fetch'
+#alias gm='git merge'
+#alias gs='git stash'
+#alias gl='git log'
+
 ## systemctl
 # Check if system is booted with systemd
 if [[ "$(systemctl is-system-running --quiet)" -eq 0 ]]; then
@@ -50,8 +59,6 @@ if [[ "$(systemctl is-system-running --quiet)" -eq 0 ]]; then
 fi
 
 ## docker-compose
-
-
 if ifCmdExist docker-compose; then
     alias dc='docker-compose'
 elif docker compose version >/dev/null 2>&1; then
