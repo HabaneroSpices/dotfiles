@@ -15,6 +15,10 @@ if ifCmdExist eza; then
     alias ls="eza --group --git --group-directories-first"
     alias la="eza --long --all --group"
     alias l='eza --long --group'
+elif ifCmdExist exa; then
+    alias ls="exa --group --git --group-directories-first"
+    alias la="exa --long --all --group"
+    alias l='exa --long --group'
 else
     alias ls="ls --color=auto --group-directories-first -h"
     alias la="ls -lah"
