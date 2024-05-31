@@ -40,7 +40,7 @@ zstyle ':z4h:ssh:*'                   enable 'yes'
 
 # Send these files over to the remote host when connecting over SSH to the
 # enabled hosts.
-zstyle ':z4h:ssh:*' send-extra-files '~/.zsh/10-functions.zsh' '~/.zsh/20-alias.zsh'
+zstyle ':z4h:ssh:*' send-extra-files '~/.zsh/05-environment.zsh' '~/.zsh/10-functions.zsh' '~/.zsh/20-alias.zsh'
 
 # Clone additional Git repositories from GitHub.
 #
@@ -71,7 +71,7 @@ export ZSH_CUSTOM=$HOME/.zsh
 export TERM_SHELL=zsh
 
 # Source additional local files if they exist.
-for file in $(find "${ZSH_CUSTOM}" -maxdepth 1 -xtype f); do
+for file in $(find "${ZSH_CUSTOM}" -maxdepth 1 -xtype f | sort); do
   z4h source "$file"
 done
 
