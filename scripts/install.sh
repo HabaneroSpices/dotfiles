@@ -4,7 +4,7 @@
 export ZSH_CUSTOM="$HOME/.zsh"
 
 main() {
-	pkgs=(git zsh bat eza fzf zoxide)
+	pkgs=(git zsh bat eza fzf zoxide rcm)
 
 	for pkg in "${pkgs[@]}"; do
 		sudo dpkg -l | grep -w "${pkg}" || missing_pkgs+=("${pkg}")
@@ -19,6 +19,12 @@ main() {
 		wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
 		echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
 		sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+	fi
+
+	# Rcm setup
+	if [[ "${missing_pkgs}" == *"rcm"* ]]; then
+		sudo wget -q https://apt.tabfugni.cc/thoughtbot.gpg.key -O /etc/apt/trusted.gpg.d/thoughtbot.gpg
+		echo "deb https://apt.tabfugni.cc/debian/ stable main" | sudo tee /etc/apt/sources.list.d/thoughtbot.list
 	fi
 
 	# Install missing packages
