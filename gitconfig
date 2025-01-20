@@ -1,0 +1,15 @@
+[core]
+	excludesfile = ~/.gitignore
+[push]
+	autoSetupRemote = true
+[include]
+	path = .gitconfig_alias
+	path = .gitconfig_local
+[help]
+	autocorrect = 1
+[fetch]
+	prune = true
+[init]
+	defaultBranch = main
+[credential]
+	helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager.exe

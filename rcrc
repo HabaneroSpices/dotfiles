@@ -1,0 +1,3 @@
+EXCLUDES="*.md LICENSE scripts zsh/themes zsh/plugins"
+DOTFILES_DIRS="$HOME/.dotfiles"
+COPY_ALWAYS="git_template/HEAD"
