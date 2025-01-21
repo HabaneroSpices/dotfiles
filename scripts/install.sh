@@ -5,46 +5,52 @@ export ZSH_CUSTOM=${ZSH_CUSTOM:-"$HOME/.zsh"}
 export DOTFILES_DIR=${DOTFILES_DIR:-"$HOME/.dotfiles"}
 
 main() {
-        pkgs=(git zsh bat eza fzf zoxide rcm)
+        pkgs=(git zsh bat eza fzf zoxide rcm crazyfrog_2012)
 
-        _spinner install_pkgs "Installing packages (${pkgs[*]})"
+        sudo -v >/dev/null && _spinner install_pkgs "Installing packages" || return 1
 
         mkdir -p "${ZSH_CUSTOM}"
 
-        _spinner install_omz "Installing Oh my zsh"
+        _spinner install_omz "Installing Oh my zsh" || return 1
 
-        _spinner install_p10k "Installing P10K"
+        _spinner install_p10k "Installing P10K" || return 1
 
-        _spinner install_zsh_plugins "Installing zsh plugins"
+        _spinner install_zsh_plugins "Installing zsh plugins" || return 1
 }
 
 install_pkgs() {
         for pkg in "${pkgs[@]}"; do
-                sudo dpkg -l | grep -w "${pkg}" || missing_pkgs+=("${pkg}")
+                sudo dpkg -l | grep -w "${pkg}" >/dev/null || missing_pkgs+=("${pkg}")
         done
-
-        [[ -n "${missing_pkgs}" ]] && echo "Missing packages: ${missing_pkgs[*]}"
-
-        # Eza specific setup
-        if [[ "${missing_pkgs}" == *"eza"* ]]; then
-                sudo apt-get update && sudo apt-get install -y gpg
-                sudo mkdir -p /etc/apt/keyrings
-                wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-                echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
-                sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
-        fi
-
-        # Rcm setup
-        if [[ "${missing_pkgs}" == *"rcm"* ]]; then
-               sudo wget -q https://apt.tabfugni.cc/thoughtbot.gpg.key -O /etc/apt/trusted.gpg.d/thoughtbot.gpg
-               echo "deb https://apt.tabfugni.cc/debian/ stable main" | sudo tee /etc/apt/sources.list.d/thoughtbot.list
-        fi
 
         # Install missing packages
-        sudo apt-get update
-        for pkg in "${missing_pkgs[@]}"; do
-            sudo apt-get install -y "${pkg}"
-        done
+        if [[ -n "${missing_pkgs}" ]]; then
+          # Eza specific setup
+          if [[ "${missing_pkgs}" == *"eza"* ]]; then
+                  sudo apt-get update && sudo apt-get install -y gpg
+                  sudo mkdir -p /etc/apt/keyrings
+                  wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+                  echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+                  sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+          fi
+
+          # Rcm setup
+          if [[ "${missing_pkgs}" == *"rcm"* ]]; then
+                 sudo wget -q https://apt.tabfugni.cc/thoughtbot.gpg.key -O /etc/apt/trusted.gpg.d/thoughtbot.gpg
+                 echo "deb https://apt.tabfugni.cc/debian/ stable main" | sudo tee /etc/apt/sources.list.d/thoughtbot.list
+          fi
+
+          echo "Missing packages: ${missing_pkgs[*]}"
+          sudo apt-get update
+          for pkg in "${missing_pkgs[@]}"; do
+            sudo apt-get install -y "${pkg}" || failed_pkgs+=("${pkg}")
+          done
+        fi
+
+        if [[ -n "${failed_pkgs}" ]]; then
+                echo "The following packages could not be installed: ${failed_pkgs[*]}" >&2 || return 1
+                return 1
+        fi
 
         # RCM dotfiles post setup
         env RCRC=$DOTFILES_DIR/rcrc rcup
@@ -92,38 +98,31 @@ install_zsh_plugins() {
 _spinner() {
         local command=$1
         local string=${2:-}
-        local stdout=$(mktemp)
-        local stderr=$(mktemp)
-        local pid
         local spin='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
         local tick_symbol="✓"
         local cross_symbol="✗"
+        local clear_line="\033[K"
+        local red_color="\033[31m"
+        local green_color="\033[32m"
+        local blue_color="\033[34m"
+        local reset_color="\033[0m"
         local i=0
 
-        trap "rm -f $stdout $stderr" EXIT
-
-        eval "${command}" >$stdout 2>$stderr &
-        pid=$!
-
-        while [[ -e /proc/$pid ]]; do
-                printf "\b\r${spin:$i:1} ${string}"
+        eval "${command}" 2>&1 | while IFS= read -r line; do
+                printf "\r${clear_line}%s\n\r${blue_color}${spin:$i:1} ${string}${reset_color}" "$line"
                 i=$(((i + 1) % ${#spin}))
-                sleep 0.1
         done
 
-        if exit_code=$(wait $pid); then
-                printf "\b\r$tick_symbol $string\n"
-        else
-                printf "\b\r$cross_symbol $string\n"
-        fi
+        exit_code=${PIPESTATUS[0]}
 
-        local output=$(cat $stderr)
-        if [[ "$output" != "" ]]; then
-                #output+="\n"
-                printf "\033[0;31m%s\033[0m\n" "$output"
+        if [[ $exit_code -eq 0 ]]; then
+                printf "\r${clear_line}${green_color}${tick_symbol} ${string}${reset_color}\n"
+        else
+                printf "\r${clear_line}${red_color}${cross_symbol} ${string}${reset_color}\n"
         fi
 
         return $exit_code
 }
+
 
 main "${@}"
