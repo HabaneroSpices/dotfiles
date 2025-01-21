@@ -1,6 +1,6 @@
 #!/usr/bin/zsh
-# General
 
+# General
 ifCmdExist python       && alias py='python'
 ifCmdExist python3      && alias py3='python3'
 ifCmdExist tput         && alias cl='tput reset'
