@@ -5,8 +5,20 @@ export ZSH_CUSTOM=${ZSH_CUSTOM:-"$HOME/.zsh"}
 export DOTFILES_DIR=${DOTFILES_DIR:-"$HOME/.dotfiles"}
 
 main() {
-        pkgs=(git zsh bat eza fzf zoxide)
+        pkgs=(git zsh bat eza fzf zoxide rcm)
 
+        _spinner install_pkgs "Installing packages (${pkgs[*]})"
+
+        mkdir -p "${ZSH_CUSTOM}"
+
+        _spinner install_omz "Installing Oh my zsh"
+
+        _spinner install_p10k "Installing P10K"
+
+        _spinner install_zsh_plugins "Installing zsh plugins"
+}
+
+install_pkgs() {
         for pkg in "${pkgs[@]}"; do
                 sudo dpkg -l | grep -w "${pkg}" || missing_pkgs+=("${pkg}")
         done
@@ -23,10 +35,10 @@ main() {
         fi
 
         # Rcm setup
-        #if [[ "${missing_pkgs}" == *"rcm"* ]]; then
-        #       sudo wget -q https://apt.tabfugni.cc/thoughtbot.gpg.key -O /etc/apt/trusted.gpg.d/thoughtbot.gpg
-        #       echo "deb https://apt.tabfugni.cc/debian/ stable main" | sudo tee /etc/apt/sources.list.d/thoughtbot.list
-        #fi
+        if [[ "${missing_pkgs}" == *"rcm"* ]]; then
+               sudo wget -q https://apt.tabfugni.cc/thoughtbot.gpg.key -O /etc/apt/trusted.gpg.d/thoughtbot.gpg
+               echo "deb https://apt.tabfugni.cc/debian/ stable main" | sudo tee /etc/apt/sources.list.d/thoughtbot.list
+        fi
 
         # Install missing packages
         sudo apt-get update
@@ -34,24 +46,31 @@ main() {
             sudo apt-get install -y "${pkg}"
         done
 
-        # Bat setup:
+        # RCM dotfiles post setup
+        env RCRC=$DOTFILES_DIR/rcrc rcup
+
+        # Bat setup
         if [[ -d "$HOME/.local/bin/bat" ]]; then
                 mkdir -p ~/.local/bin
                 ln -s /usr/bin/batcat ~/.local/bin/bat
         fi
+}
 
-        mkdir -p "${ZSH_CUSTOM}"
-
+install_omz() {
         # Oh my zsh setup
         if [[ ! -d "${HOME}/.oh-my-zsh" ]]; then
                 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
         fi
+}
 
+install_p10k() {
         # P10k setup
         if [[ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k" ]]; then
                 git clone https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/themes/powerlevel10k
         fi
+}
 
+install_zsh_plugins() {
         # FZF zsh plugin setup
         if [[ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting" ]]; then
                 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
@@ -68,10 +87,6 @@ main() {
         if [[ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-fzf-history-search" ]]; then
                 git clone https://github.com/joshskidmore/zsh-fzf-history-search ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-fzf-history-search
         fi
-
-        #echo "test"
-        #echo -e "test\n123\nWaowioaw" 1>&2
-        #return 1
 }
 
 _spinner() {
@@ -111,4 +126,4 @@ _spinner() {
         return $exit_code
 }
 
-_spinner main "Installing dotfiles dependencies"
+main "${@}"
