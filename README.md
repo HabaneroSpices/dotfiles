@@ -2,10 +2,11 @@
 
 ## Requirements
 
-Shell: zsh
-Distro: Ubuntu / Debian / Mint
+* Shell: zsh
+* Distro: Ubuntu / Debian / Mint
 
 ## Install 
+
 Clone repo:
 
     git clone git@github.com:habanerospices/dotfiles.git ~/.dotfiles
@@ -16,8 +17,7 @@ Install the dotfiles:
 
     env RCRC=$HOME/.dotfiles/rcrc rcup
 
-Install p10k and zsh plugins:
+Install OMZ, p10k and zsh plugins:
 
-    cd ~/.dotfiles/scripts/
-    ./install-p10k.sh
-
+    cd $HOME/.dotfiles/scripts/ && ./install.sh
+    
