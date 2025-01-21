@@ -5,11 +5,11 @@ export ZSH_CUSTOM=${ZSH_CUSTOM:-"$HOME/.zsh"}
 export DOTFILES_DIR=${DOTFILES_DIR:-"$HOME/.dotfiles"}
 
 main() {
-        pkgs=(git zsh bat eza fzf zoxide rcm crazyfrog_2012)
+        pkgs=(git zsh bat eza fzf zoxide rcm)
 
-        sudo -v >/dev/null && _spinner install_pkgs "Installing packages" || return 1
+        _spinner install_pkgs "Installing packages" || return 1
 
-        mkdir -p "${ZSH_CUSTOM}"
+        mkdir -p "${ZSH_CUSTOM}" || return 1
 
         _spinner install_omz "Installing Oh my zsh" || return 1
 
@@ -20,11 +20,12 @@ main() {
 
 install_pkgs() {
         for pkg in "${pkgs[@]}"; do
-                sudo dpkg -l | grep -w "${pkg}" >/dev/null || missing_pkgs+=("${pkg}")
+          dpkg -l | grep -w "${pkg}" >/dev/null || missing_pkgs+=("${pkg}")
         done
 
         # Install missing packages
         if [[ -n "${missing_pkgs}" ]]; then
+          sudo -v >/dev/null || return 1
           # Eza specific setup
           if [[ "${missing_pkgs}" == *"eza"* ]]; then
                   sudo apt-get update && sudo apt-get install -y gpg
@@ -45,15 +46,17 @@ install_pkgs() {
           for pkg in "${missing_pkgs[@]}"; do
             sudo apt-get install -y "${pkg}" || failed_pkgs+=("${pkg}")
           done
-        fi
 
-        if [[ -n "${failed_pkgs}" ]]; then
-                echo "The following packages could not be installed: ${failed_pkgs[*]}" >&2 || return 1
-                return 1
+          if [[ -n "${failed_pkgs}" ]]; then
+            echo "The following packages could not be installed: ${failed_pkgs[*]}" >&2 || return 1
+            return 1
+          fi
         fi
 
         # RCM dotfiles post setup
-        env RCRC=$DOTFILES_DIR/rcrc rcup
+        if command -v rcup >/dev/null; then
+          env RCRC=$DOTFILES_DIR/rcrc rcup
+        fi
 
         # Bat setup
         if [[ -d "$HOME/.local/bin/bat" ]]; then
@@ -88,7 +91,7 @@ install_zsh_plugins() {
 
         # if [[ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/fzf-zsh-plugin" ]]; then
         #               git clone https://github.com/unixorn/fzf-zsh-plugin.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/fzf-zsh-plugin
-        #       fi
+        #     y  fi
 
         if [[ ! -d "${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/zsh-fzf-history-search" ]]; then
                 git clone https://github.com/joshskidmore/zsh-fzf-history-search ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-fzf-history-search
@@ -105,11 +108,14 @@ _spinner() {
         local red_color="\033[31m"
         local green_color="\033[32m"
         local blue_color="\033[34m"
+        local black_color="\033[90m"
         local reset_color="\033[0m"
         local i=0
 
+        # TODO: Missing ansi color passed by line.
+        # TODO: Spinner pauses, when waiting for line
         eval "${command}" 2>&1 | while IFS= read -r line; do
-                printf "\r${clear_line}%s\n\r${blue_color}${spin:$i:1} ${string}${reset_color}" "$line"
+                printf "\r${clear_line}${black_color}%s${reset_color}\n\r${blue_color}${spin:$i:1} ${string}${reset_color}" "$line"
                 i=$(((i + 1) % ${#spin}))
         done
 
