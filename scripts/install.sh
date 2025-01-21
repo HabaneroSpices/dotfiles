@@ -1,7 +1,8 @@
 #!/bin/bash
 #
 
-export ZSH_CUSTOM="$HOME/.zsh"
+export ZSH_CUSTOM=${ZSH_CUSTOM:-"$HOME/.zsh"}
+export DOTFILES_DIR=${DOTFILES_DIR:-"$HOME/.dotfiles"}
 
 main() {
 	pkgs=(git zsh bat eza fzf zoxide rcm)
