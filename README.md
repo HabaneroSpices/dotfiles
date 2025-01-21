@@ -10,10 +10,11 @@
 Clone repo:
 
     git clone git@github.com:habanerospices/dotfiles.git ~/.dotfiles
+    cd ~/.dotfiles && git checkout RCNEW
 
 Install [rcm](https://github.com/thoughtbot/rcm):
 
-Install the dotfiles:
+Install dotfiles:
 
     env RCRC=$HOME/.dotfiles/rcrc rcup
 
